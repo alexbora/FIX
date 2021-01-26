@@ -43,6 +43,8 @@
 #define INADDR_NONE 0xffffffff
 #endif
 
+volatile int FLAG = 0;
+
 static inline
 int sockfd(const char hostname[], const int port){
 	register int sockfd = 0;
@@ -95,11 +97,6 @@ SSL *ssl_conn(const int sockfd, const char *hostname)
 	return ssl;
 }
 
-typedef struct{
-	char *tag;
-	void *val;
-}tag;
-
 
 void reverse(char s[])
  {
@@ -130,24 +127,46 @@ void itoa(int n, char s[])
 char *heartbeat(){
 	char *heartbeat = malloc(4096);
 	char *begin = "8=FIX.4.2\1"; 
-	char *tag  = "35=A\1";
+	char *tag  = "35=0\1";
 	char len[64] = "9=";
-	char len1[64];
-	size_t l = strlen(tag);
+	char checks[64] = "10=";
+	char *test = "112=TestReqID\1";
+
+	char len1[64], chk[64];
+	size_t l = strlen(tag) + strlen(test);
 	itoa(l, len1);
 	strcat(heartbeat, begin);
 	strcat(len, len1);
 	strcat(heartbeat, len);
 	strcat(heartbeat, tag);
-
+	strcat(heartbeat, test);
+int csum = checksum(heartbeat, strlen(heartbeat), 0);
+itoa(csum, chk);
+strcat(checks, chk);
+strcat(checks, "\1");
+strcat(heartbeat, checks);
 	printf("tag: %s\n", heartbeat);
 	return heartbeat;
+}
+
+typedef struct{
+	SSL *s;
+	char *heart;
+}args;
+
+void *parallel(void *p){
+	args *pi = p;
+	while (FLAG == 1){
+		SSL_write(pi->s, pi->heart, strlen(pi->heart));
+		FLAG = 0;
+	}
+return NULL;
 }
 
 int main(void)
 {
 	char *heart = heartbeat();
-free(heart);
+	
 	char *hostname = "fix.gdax.com";
 	int port = 4198;
 	int sock = sockfd(hostname, port);
@@ -159,11 +178,16 @@ free(heart);
 	SSL *s = ssl_conn(sock, hostname);
 	char *buf = malloc(MSG_SIZE);
 	message *m = start_message();
-	printf("MSG: %s\n", m->tmp[7]);
+
+	args args = {s, heart};
+	
+pthread_t t;
+pthread_create(&t, NULL, parallel, &args);
+
 	SSL_write(s, m->tmp[7], strlen(m->tmp[7]));
 	while(1 < SSL_read(s, buf, MSG_SIZE)){
 		printf("Response:\n%s\n", buf);
-
+		if(strstr(buf, "TEST10"))FLAG = 1;
 	}
 }
 
