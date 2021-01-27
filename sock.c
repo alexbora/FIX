@@ -183,11 +183,13 @@ int main(void)
 	
 pthread_t t;
 pthread_create(&t, NULL, parallel, &args);
+SSL_write(s, m->tmp[7], strlen(m->tmp[7]));
+while(strstr(buf, "TEST10"))FLAG = 1;
 
 	SSL_write(s, m->tmp[7], strlen(m->tmp[7]));
 	while(1 < SSL_read(s, buf, MSG_SIZE)){
 		printf("Response:\n%s\n", buf);
-		if(strstr(buf, "TEST10"))FLAG = 1;
+		while(strstr(buf, "TEST10"))FLAG = 1;
 	}
 }
 
