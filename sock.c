@@ -99,39 +99,63 @@ SSL *ssl_conn(const int sockfd, const char *hostname)
 
 
 void reverse(char s[])
- {
-     int i, j;
-     char c;
+{
+	int i, j;
+	char c;
 
-     for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
-         c = s[i];
-         s[i] = s[j];
-         s[j] = c;
-     }
+	for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
 }  
 void itoa(int n, char s[])
- {
-     int i, sign;
+{
+	int i, sign;
 
-     if ((sign = n) < 0)  /* record sign */
-         n = -n;          /* make n positive */
-     i = 0;
-     do {       /* generate digits in reverse order */
-         s[i++] = n % 10 + '0';   /* get next digit */
-     } while ((n /= 10) > 0);     /* delete it */
-     if (sign < 0)
-         s[i++] = '-';
-     s[i] = '\0';
-     reverse(s);
-}  
+	if ((sign = n) < 0)  /* record sign */
+		n = -n;          /* make n positive */
+	i = 0;
+	do {       /* generate digits in reverse order */
+		s[i++] = n % 10 + '0';   /* get next digit */
+	} while ((n /= 10) > 0);     /* delete it */
+	if (sign < 0)
+		s[i++] = '-';
+	s[i] = '\0';
+	reverse(s);
+} 
+
+
+void format_time(char *buf)
+{
+	time_t rawtime = time(0);
+	struct tm* const restrict t = localtime(&rawtime);
+	sprintf((char*)buf, "%d" "%02d" "%02d-" "%02d:"  "%02d:"  "%02d" ,
+			t->tm_year+1900,
+			t->tm_mon+1,
+			t->tm_mday,
+			t->tm_hour,
+			t->tm_min,
+			t->tm_sec
+	       );
+}
+
+
 char *heartbeat(){
 	char *heartbeat = malloc(4096);
 	char *begin = "8=FIX.4.2\1"; 
 	char *tag  = "35=0\1";
 	char len[64] = "9=";
 	char checks[64] = "10=";
-	char *test = "112=TestReqID\1";
+	char test[64] = "112=";
+	char *id = "TEST10";
+	strcat(test, id);
+	char tim[129] = "52=";
 
+	char timestamp[64];
+	format_time(timestamp);
+	strcat(tim, timestamp);
+	strcat(tim, "\1"); printf("%s\n", timestamp);
 	char len1[64], chk[64];
 	size_t l = strlen(tag) + strlen(test);
 	itoa(l, len1);
@@ -140,11 +164,12 @@ char *heartbeat(){
 	strcat(heartbeat, len);
 	strcat(heartbeat, tag);
 	strcat(heartbeat, test);
-int csum = checksum(heartbeat, strlen(heartbeat), 0);
-itoa(csum, chk);
-strcat(checks, chk);
-strcat(checks, "\1");
-strcat(heartbeat, checks);
+	strcat(heartbeat, tim);
+	int csum = checksum(heartbeat, strlen(heartbeat), 0);
+	itoa(csum, chk);
+	strcat(checks, chk);
+	strcat(checks, "\1");
+	strcat(heartbeat, checks);
 	printf("tag: %s\n", heartbeat);
 	return heartbeat;
 }
@@ -160,13 +185,37 @@ void *parallel(void *p){
 		SSL_write(pi->s, pi->heart, strlen(pi->heart));
 		FLAG = 0;
 	}
-return NULL;
+	return NULL;
 }
+char *test_req(char *buf){
+	char *ptr = malloc(128);
+	*ptr = *buf;
+	char *arr = "TEST10=";
+while (ptr)
+{
+	ptr = strstr(ptr, arr);
+	if (ptr == NULL)
+	{
+		break;
+	}
+
+	ptr = strchr(ptr, '=');
+	if (ptr == NULL)
+	{
+		break;
+	}
+
+	ptr++;
+return ptr;
+}
+
+}
+
 
 int main(void)
 {
 	char *heart = heartbeat();
-	
+
 	char *hostname = "fix.gdax.com";
 	int port = 4198;
 	int sock = sockfd(hostname, port);
@@ -180,18 +229,50 @@ int main(void)
 	message *m = start_message();
 
 	args args = {s, heart};
-	
-pthread_t t;
-pthread_create(&t, NULL, parallel, &args);
-SSL_write(s, m->tmp[7], strlen(m->tmp[7]));
-while(strstr(buf, "TEST10"))FLAG = 1;
+
+	pthread_t t;
+	pthread_create(&t, NULL, parallel, &args);
+	SSL_write(s, m->tmp[7], strlen(m->tmp[7]));
+	while(strstr(buf, "TEST10"))FLAG = 1;
+	pthread_join(t, NULL);
 
 	SSL_write(s, m->tmp[7], strlen(m->tmp[7]));
+
+	char *ptr = buf;
+	
 	while(1 < SSL_read(s, buf, MSG_SIZE)){
 		printf("Response:\n%s\n", buf);
-		while(strstr(buf, "TEST10"))FLAG = 1;
+		while(strstr(buf, "TEST10")){
+			FLAG = 1;
+		SSL_write(s, heart, strlen(heart));
+		}
 	}
+
 }
+#if 0
+
+void test_req(char *buf){
+	char *ptr = buf;
+	char *arr = "TEST10=";
+while (ptr)
+{
+	ptr = strstr(ptr, arr);
+	if (ptr == NULL)
+	{
+		break;
+	}
+
+	ptr = strchr(ptr, '=');
+	if (ptr == NULL)
+	{
+		break;
+	}
+
+	ptr++;
+
+}
+}
+#endif
 
 #if 0
 pthread_t t1;
