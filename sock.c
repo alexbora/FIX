@@ -3,11 +3,13 @@
 #include <string.h>
 #include <time.h>
 #include <openssl/evp.h>
-#include <allheaders.h>
 #include <fcntl.h>
 #include <openssl/ssl.h>
-#include "merge_unrolled.h"
 #include <pthread.h>
+
+
+#include <allheaders.h>
+#include "merge_unrolled.h"
 
 #define _GNU_SOURCE
 #ifndef BUFISZE
@@ -16,9 +18,6 @@
 
 #include <sys/socket.h>
 #include <netdb.h>
-/* #include<netinet/in.h> */
-/* #include<netinet/tcp.h> */
-/* #include<sys/types.h> */
 
 #include <sys/signal.h>
 #ifdef WIN32
@@ -27,7 +26,6 @@
 #include <ws2tcpip.h>
 #define close closesocket
 #else
-/* #include <netdb.h> */
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -71,7 +69,6 @@ int sockfd(const char hostname[], const int port){
 
 	setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY,(int[]){1},  sizeof(int));
 	setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (int[]){1},  sizeof(int));
-	//setsockopt(sockfd, IPPROTO_TCP, TCP_QUICKACK,(int[]){1},  sizeof(int));
 	setsockopt(sockfd, SOL_SOCKET, SO_SNDLOWAT,(int[]){2}, sizeof(int));
 
 	connect(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr));
@@ -97,35 +94,6 @@ SSL *ssl_conn(const int sockfd, const char *hostname)
 	return ssl;
 }
 
-
-void reverse(char s[])
-{
-	int i, j;
-	char c;
-
-	for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
-		c = s[i];
-		s[i] = s[j];
-		s[j] = c;
-	}
-}  
-void itoa(int n, char s[])
-{
-	int i, sign;
-
-	if ((sign = n) < 0)  /* record sign */
-		n = -n;          /* make n positive */
-	i = 0;
-	do {       /* generate digits in reverse order */
-		s[i++] = n % 10 + '0';   /* get next digit */
-	} while ((n /= 10) > 0);     /* delete it */
-	if (sign < 0)
-		s[i++] = '-';
-	s[i] = '\0';
-	reverse(s);
-} 
-
-
 void format_time(char *buf)
 {
 	time_t rawtime = time(0);
@@ -141,158 +109,49 @@ void format_time(char *buf)
 }
 
 
-char *heartbeat(){
-	char *heartbeat = malloc(4096);
-	char *begin = "8=FIX.4.2\1"; 
-	char *tag  = "35=0\1";
-	char len[64] = "9=";
-	char checks[64] = "10=";
-	char test[64] = "112=";
-	char *id = "TEST10";
-	strcat(test, id);
-	char tim[129] = "52=";
+char *heart(){
+	char *heartbeat = malloc(256);
+	char timestamp[64], tmp[64];
 
-	char timestamp[64];
 	format_time(timestamp);
-	strcat(tim, timestamp);
-	strcat(tim, "\1"); printf("%s\n", timestamp);
-	char len1[64], chk[64];
-	size_t l = strlen(tag) + strlen(test);
-	itoa(l, len1);
-	strcat(heartbeat, begin);
-	strcat(len, len1);
-	strcat(heartbeat, len);
-	strcat(heartbeat, tag);
-	strcat(heartbeat, test);
-	strcat(heartbeat, tim);
-	int csum = checksum(heartbeat, strlen(heartbeat), 0);
-	itoa(csum, chk);
-	strcat(checks, chk);
-	strcat(checks, "\1");
-	strcat(heartbeat, checks);
-	printf("tag: %s\n", heartbeat);
+
+	size_t length = strlen("35=0\1") + strlen("TEST\1") + strlen("49=Coinbase^56=Coinbase^34=4\1") + strlen(timestamp);
+	
+	sprintf(heartbeat, "8=FIX.4.2^9=%ld^35=0^49=Coinbase^56=Coinbase^34=4^52=%s^112=TEST^", length, timestamp);
+	
+	int chk = checksum(heartbeat, strlen(heartbeat), 0);
+	
+	sprintf(tmp, "10=%d^", chk);
+	strcat(heartbeat, tmp);
+	
+	for (size_t i=0; i<strlen(heartbeat); i++)(heartbeat[i] == '^') ? heartbeat[i] = '\1': 0;
+	
 	return heartbeat;
 }
 
-typedef struct{
-	SSL *s;
-	char *heart;
-}args;
 
-void *parallel(void *p){
-	args *pi = p;
-	while (FLAG == 1){
-		SSL_write(pi->s, pi->heart, strlen(pi->heart));
-		FLAG = 0;
-	}
-	return NULL;
-}
-char *test_req(char *buf){
-	char *ptr = malloc(128);
-	*ptr = *buf;
-	char *arr = "TEST10=";
-while (ptr)
-{
-	ptr = strstr(ptr, arr);
-	if (ptr == NULL)
-	{
-		break;
-	}
-
-	ptr = strchr(ptr, '=');
-	if (ptr == NULL)
-	{
-		break;
-	}
-
-	ptr++;
-return ptr;
-}
-
-}
-
-
-int main(void)
-{
-	char *heart = heartbeat();
-
-	char *hostname = "fix.gdax.com";
-	int port = 4198;
-	int sock = sockfd(hostname, port);
-
-	int ofcmode=fcntl(sock,F_GETFL,0);
-	ofcmode|=O_NDELAY;
-	//   fcntl(sock,F_SETFL,ofcmode);
-
-	SSL *s = ssl_conn(sock, hostname);
-	char *buf = malloc(MSG_SIZE);
-	message *m = start_message();
-
-	args args = {s, heart};
-
-	pthread_t t;
-	pthread_create(&t, NULL, parallel, &args);
-	SSL_write(s, m->tmp[7], strlen(m->tmp[7]));
-	while(strstr(buf, "TEST10"))FLAG = 1;
-	pthread_join(t, NULL);
-
-	SSL_write(s, m->tmp[7], strlen(m->tmp[7]));
-
-	char *ptr = buf;
+void login(SSL *s, char *login){
+	char *heart_bt = heart(); char *buf = malloc(MSG_SIZE);
 	
-	while(1 < SSL_read(s, buf, MSG_SIZE)){
-		printf("Response:\n%s\n", buf);
-		while(strstr(buf, "TEST10")){
-			FLAG = 1;
-		SSL_write(s, heart, strlen(heart));
+	SSL_write(s, login, strlen(login));
+	
+	while (1<SSL_read(s, buf, MSG_SIZE)){
+		printf(KGRN"Received: "RESET"%s\n", buf);
+		while(strstr(buf, "35=1")){
+			SSL_write(s, heart_bt, strlen(heart_bt));
 		}
 	}
-
+	free(heart_bt); free(buf);
 }
-#if 0
 
-void test_req(char *buf){
-	char *ptr = buf;
-	char *arr = "TEST10=";
-while (ptr)
-{
-	ptr = strstr(ptr, arr);
-	if (ptr == NULL)
-	{
-		break;
-	}
 
-	ptr = strchr(ptr, '=');
-	if (ptr == NULL)
-	{
-		break;
-	}
+int main(void){
 
-	ptr++;
-
+	char *hostname = "fix.gdax.com";
+	SSL *s = ssl_conn(sockfd(hostname, 4198), hostname);
+	
+	char *buf = malloc(MSG_SIZE);
+	message *m = start_message();
+	login(s, m->tmp[7]);
 }
-}
-#endif
 
-#if 0
-pthread_t t1;
-pthread_create(&t1, NULL, myThreadFun, NULL); 
-pthread_join(t1, NULL);
-
-
-while (strstr(buf, "TEST10")){
-
-
-	char heartbeat[64],  heartbeat2[64];
-	size_t len_h1 = strlen("35=|") +  strlen("0");// + strlen(m->tmp[6]);
-	sprintf(heartbeat, "8=FIX.4.2|9=%ld|35=0|", len_h1);
-	for(size_t i=0;i<strlen(heartbeat);i++)(heartbeat[i] == BAR)?heartbeat[i]=SOH :0;
-	int check = checksum(heartbeat, strlen(heartbeat), 0);
-	sprintf(heartbeat2, "10=%d\1", check);
-	strcat((char*)heartbeat, (char*)heartbeat2);
-	SSL_write(s, heartbeat, strlen(heartbeat));
-	//printf("heartbeat %s\n", heartbeat);
-	printf("BUF: %s\n", buf);}
-
-	}
-#endif
