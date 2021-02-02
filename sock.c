@@ -1,3 +1,9 @@
+/**
+ * @author      : alex (alexbora@gmail.com)
+ * @file        : sock
+ * @created     : Sunday Jan 31, 2021 13:16:33 EET
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,7 +49,9 @@
 
 volatile int FLAG = 0;
 
-static inline
+pthread_mutex_t m1;
+
+
 int sockfd(const char hostname[], const int port){
 	register int sockfd = 0;
 	struct  sockaddr_in servAddr = {0};
@@ -80,7 +88,6 @@ int sockfd(const char hostname[], const int port){
 	return sockfd;
 }
 
-static inline
 SSL *ssl_conn(const int sockfd, const char *hostname)
 {
 	SSL *ssl = NULL;
@@ -110,48 +117,104 @@ void format_time(char *buf)
 
 
 char *heart(){
-	char *heartbeat = malloc(256);
+	char *heartbeat	= malloc (256 );
+	if ( heartbeat==NULL ) {
+		fprintf ( stderr, "\ndynamic memory allocation failed\n" );
+		exit (EXIT_FAILURE);
+	}
+
 	char timestamp[64], tmp[64];
 
 	format_time(timestamp);
 
-	size_t length = strlen("35=0\1") + strlen("TEST\1") + strlen("49=Coinbase^56=Coinbase^34=4\1") + strlen(timestamp);
-	
-	sprintf(heartbeat, "8=FIX.4.2^9=%ld^35=0^49=Coinbase^56=Coinbase^34=4^52=%s^112=TEST^", length, timestamp);
-	
+	size_t length = strlen("35=0|") + strlen("TEST|") + strlen("49=Coinbase|56=Coinbase|") + strlen(timestamp);
+
+	sprintf(heartbeat, "8=FIX.4.2|9=%ld|35=0|49=Coinbase|56=Coinbase|52=%s|112=TEST|", length, timestamp);
+
 	int chk = checksum(heartbeat, strlen(heartbeat), 0);
-	
-	sprintf(tmp, "10=%d^", chk);
+
+	sprintf(tmp, "10=%d|", chk);
 	strcat(heartbeat, tmp);
-	
-	for (size_t i=0; i<strlen(heartbeat); i++)(heartbeat[i] == '^') ? heartbeat[i] = '\1': 0;
-	
+
+	for (size_t i=0; i<strlen(heartbeat); i++)(heartbeat[i] == '|') ? heartbeat[i] = '\1': 0;
+
 	return heartbeat;
 }
 
+typedef struct{
+	SSL *s;
+	char *heart;
+}args;
 
+void *parallel(void *params){
+	args *a = params;
+	SSL_write(a->s, a->heart, strlen(a->heart));
+}
 void login(SSL *s, char *login){
-	char *heart_bt = heart(); char *buf = malloc(MSG_SIZE);
-	
+	char *heart_bt = heart(); 
+
+	char *buf	= malloc (MSG_SIZE );
+	if ( buf==NULL ) {
+		fprintf ( stderr, "\ndynamic memory allocation failed\n" );
+		exit (EXIT_FAILURE);
+	}
+
 	SSL_write(s, login, strlen(login));
-	
+
+
 	while (1<SSL_read(s, buf, MSG_SIZE)){
-		printf(KGRN"Received: "RESET"%s\n", buf);
-		while(strstr(buf, "35=1")){
-			SSL_write(s, heart_bt, strlen(heart_bt));
+		printf(KGRN"\n Received: "RESET"%s\n", buf);
+		pthread_mutex_lock(&m1);
+		if(strstr(buf, "35=")){
+		//	SSL_write(s, heart_bt, strlen(heart_bt));
+			FLAG = 1;
+			pthread_mutex_unlock(&m1);
 		}
 	}
 	free(heart_bt); free(buf);
 }
 
+void *mark_factors(void *ptr){
+	args *a = ptr;
+	pthread_mutex_lock(&m1);
+	if(FLAG==1){
+		SSL_write(a->s, a->heart, strlen(a->heart));
+	FLAG = 0;
+	}
+	pthread_mutex_unlock(&m1);
+	return NULL;
+}
+
+
+char *GenerateCheckSum( char *buf, long bufLen )
+{
+    static char tmpBuf[ 4 ];
+    long idx;
+    unsigned int cks;
+
+    for( idx = 0L, cks = 0; idx < bufLen; cks += (unsigned int)buf[ idx++ ] );
+    sprintf( tmpBuf, "%03d", (unsigned int)( cks % 256 ) );
+    return( tmpBuf );
+
+}
 
 int main(void){
+	pthread_t t1;
+	pthread_mutex_init(&m1, NULL);
 
-	char *hostname = "fix.gdax.com";
+	const char *hostname = "fix.gdax.com";
 	SSL *s = ssl_conn(sockfd(hostname, 4198), hostname);
-	
-	char *buf = malloc(MSG_SIZE);
+
 	message *m = start_message();
+	
+	char *heart_bt = heart();
+	args a1 = (args){ s, heart_bt};
+	pthread_create(&t1, NULL, mark_factors, &a1);
+
 	login(s, m->tmp[7]);
+
+	pthread_join(t1, NULL);
+	pthread_mutex_destroy(&m1);
 }
+
 
