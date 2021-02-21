@@ -61,12 +61,13 @@ typedef struct Msg {
 	SSL *s;
 } msg;
 
-void *foo_heartbeart(void *ptr);
-void sigint_handler(int sig);
+typedef struct {
+	SSL *s;
+	char *login;
+} threading;
 
-volatile int FLAG = 0;
+void *foo_heartbeart(void *ptr);
 pthread_mutex_t m1;
-static int interrupted = 0;
 
 int sockfd(const char hostname[], const int port) {
 	register int sockfd = 0;
@@ -144,7 +145,9 @@ char *heart() {
 	char *heartbeat = malloc(256);
 
 	if (heartbeat == NULL) {
-		fprintf(stderr, "\ndynamic memory allocation failed\n");
+		fprintf(stderr,
+			"\ndynamic memory allocation failed for generating "
+			"heartbeat\n");
 
 		exit(EXIT_FAILURE);
 	}
@@ -172,58 +175,42 @@ char *heart() {
 	return heartbeat;
 }
 
-typedef struct {
-	SSL *s;
-
-	char *heart;
-
-} args;
-
-void *parallel(void *params) {
-	args *a = params;
-	SSL_write(a->s, a->heart, strlen(a->heart));
-}
-
 void login(SSL *s, char *login) {
 	char *heart_bt = heart();
 
-	char *buf = malloc(MSG_SIZE);
+	time_t t = time(NULL);
+	struct tm *tm = localtime(&t);
 
-	if (NULL == buf) {
-		fprintf(stderr, "\ndynamic memory allocation failed\n");
-		exit(EXIT_FAILURE);
+	char *buf = malloc(MSG_SIZE);
+	if (!buf) {
+		fprintf(stderr, "%s\n", "malloc-ing receiving buffer failed");
+		goto err;
 	}
+	printf(KGRN "\n Login sent at " RESET "%s\n", asctime(tm));
 
 	SSL_write(s, login, strlen(login));
 
 	while (1 < SSL_read(s, buf, MSG_SIZE)) {
 		printf(KGRN "\n Received: " RESET "%s\n", buf);
-
-		if (strstr(buf, "35=")) {
-			pthread_mutex_lock(&m1);
-			SSL_write(s, heart_bt, strlen(heart_bt));
-			FLAG = 1;
-			pthread_mutex_unlock(&m1);
+		if(strstr(buf, "35=A")) {
+			printf(KGRN"\n Login OK "RESET);
 		}
 
+		if (strstr(buf, "35=0")) {
+			pthread_mutex_lock(&m1);
+			SSL_write(s, heart_bt, strlen(heart_bt));
+			pthread_mutex_unlock(&m1);
+			printf(KMAG " Heartbeat sent at " RESET "%s\n",
+			       asctime(tm));
+		}
 	}
+err:
 	free(heart_bt);
+	heart_bt = NULL;
 	free(buf);
-}
-
-void *mark_factors(void *ptr) {
-	args *a = ptr;
-
-	pthread_mutex_lock(&m1);
-
-	if (FLAG == 1) {
-		SSL_write(a->s, a->heart, strlen(a->heart));
-		printf("write: %s\n", a->heart);
-		FLAG = 0;
-	}
-	pthread_mutex_unlock(&m1);
-
-	return NULL;
+	buf = NULL;
+	tm = NULL;
+	exit(EXIT_FAILURE);
 }
 
 char *GenerateCheckSum(char *buf, long bufLen) {
@@ -237,66 +224,63 @@ char *GenerateCheckSum(char *buf, long bufLen) {
 	return (tmpBuf);
 }
 
-typedef struct {
-	pthread_t t;
-	pthread_mutex_t m;
-	SSL *s;
-} threads;
+void *login2(void *ctx) {
+	threading *th = ctx;
+	char *heart_bt = heart();
 
-void sigint_handler(int sig) { interrupted = 1; }
+	time_t t = time(NULL);
+	struct tm *tm = localtime(&t);
 
-int main(void) {
-	signal(SIGINT, sigint_handler);
-	pthread_t t1;
-	pthread_mutex_init(&m1, NULL);
+	char *buf = malloc(MSG_SIZE);
+	if (!buf) {
+		fprintf(stderr, "%s\n", "malloc-ing receiving buffer failed");
+		goto err;
+	}
 
-	SSL *s = ssl_conn(sockfd("fix.gdax.com", 4198), "fix.gdax.com");
 
-	message *m = start_message();
-	// char *heart_bt = heart();
+	SSL_write(th->s, th->login, strlen(th->login));
+	printf(KGRN "\n Login sent at " RESET "%s", asctime(tm));
 
-	// args a1 = (args){s, heart_bt};
-	// pthread_create(&t1, NULL, mark_factors, &a1);
+	while (1 < SSL_read(th->s, buf, MSG_SIZE)) {
+		printf(KGRN "\n Received: " RESET "%s\n", buf);
+		if(strstr(buf, "35=A")) {
+		printf(KGRN" Login OK\n "RESET);
+		}
 
-	login(s, m->tmp[7]);
-
-	// pthread_join(t1, NULL);
-
-	//msg m2 = {.s = s};
-	//oo_heartbeart(&m2);
-
-	//pthread_create(&t1, NULL, foo_heartbeart, &m2);
-	//pthread_join(t1, NULL);
-
-	pthread_mutex_destroy(&m1);
-#if 0
-	threads thd = {.t = t1, .m = m1, .s = s};
-	pthread_mutex_init(&thd.m, NULL);
-	pthread_create(&thd.t, NULL, foo_heartbeart, &thd.m);
-	pthread_join(thd.t, NULL);
-
-#endif
+		if (strstr(buf, "35=0")) {
+			pthread_mutex_lock(&m1);
+			SSL_write(th->s, heart_bt, strlen(heart_bt));
+			pthread_mutex_unlock(&m1);
+			printf(KMAG " Heartbeat sent at " RESET "%s\n",
+			       asctime(tm));
+		}
+	}
+err:
+	free(heart_bt);
+	heart_bt = NULL;
+	free(buf);
+	buf = NULL;
+	tm = NULL;
+	exit(EXIT_FAILURE);
+	return NULL;
 }
 
-void *foo_heartbeart(void *ctx) {
-	msg *m = ctx;
-	char header[512] = {};
-	char footer[64] = {};
-	char body[64] = {};
-	strcpy(body, "35=0|");
-	sprintf(header, "8=FIX.4.2|9=%ld|", strlen(body));
-	strcat(header, body);
-	sprintf(footer, "10=%d", checksum(header, strlen(header), 0));
-	strcat(header, footer);
-	strcat(header, "\1");
+int main(void) {
+	pthread_mutex_init(&m1, NULL);
 
-	do {
-		pthread_mutex_lock(&m1);
-		SSL_write(m->s, header, strlen(header));
-		sleep(29);
-		pthread_mutex_unlock(&m1);
-	} while (interrupted != 0); /* -----  end do-while  ----- */
+	SSL *s = ssl_conn(sockfd(HOST, PORT), HOST);
 
-	return NULL;
+	message *m = start_message();
+
+	pthread_t t1;
+
+	threading td = {.s = s, .login = m->tmp[7]};
+
+	pthread_create(&t1, NULL, login2, &td);
+	pthread_join(t1, NULL);
+
+	//	login(s, m->tmp[7]);
+
+	pthread_mutex_destroy(&m1);
 }
 

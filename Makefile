@@ -17,4 +17,4 @@ CC=gcc-10
 FIX: sock.c merge_unrolled.c
 	$(CC) $(CFLAGS) $(IFLAGS) $(LFLAGS) sock.c merge_unrolled.c -o FIX
 clean:
-	rm -rf FIX FIX.dSYM sock.dSYM merge_unrolled.dSYM a.out
+	rm -rf FIX FIX.dSYM sock.dSYM merge_unrolled.dSYM a.out *.dSYM merge
