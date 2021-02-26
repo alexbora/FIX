@@ -34,6 +34,8 @@
 #define SOH '\1'
 #endif
 
+#include <openssl/evp.h>
+
 typedef struct{
    size_t length;
    size_t len;
@@ -56,12 +58,21 @@ typedef struct{
    size_t len;
 } logon;
 
-//static inline
 unsigned checksum(const unsigned char *buffer, const size_t len, unsigned seed);
 static inline
 void generate_msg(const account *a1, message *m, const logon *login);
 account *account_new(logon *);
 message *message_new2(int const size, const account *a);
 message *start_message();
+void format_time(char *buf);
+
+int sockfd(const char hostname[], const int port);
+void *foo_heartbeart(void *ptr);;
+SSL *ssl_conn(const int sockfd, const char *hostname);
+char *heart();
+void login(SSL *s, char *login);
+char *GenerateCheckSum(char *buf, long bufLen);
+void *login2(void *ctx);
+void *foo(void *ptr);
 
 #endif /* !__merge_unrolled_h__ */

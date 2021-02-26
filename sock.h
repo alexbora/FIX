@@ -13,10 +13,9 @@ static inline SSL *ssl_conn(const int sockfd, const char *hostname);
 static inline void login(SSL *s, char *login);
 static inline char *heart();
 static inline void format_time(char *buf);
-
 static inline mark_factors(void *ptr);
-
 GenerateCheckSum(char *buf, long bufLen);
+
 #endif /* end of include guard SOCK_H */
 
 

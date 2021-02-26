@@ -8,10 +8,11 @@
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
-//#include <apex_memmove.h>
+#include <apex_memmove.h>
 #include <allheaders.h>
 #include <libwebsockets.h>
 #include <signal.h>
+
 #include "merge_unrolled.h"
 
 #ifndef __STDC_WANT_LIBEXT1__
@@ -48,7 +49,7 @@ message *message_new2(int const size, const account *a) {
 	out->t = malloc(sizeof(struct tm));
 	return out;
 }
-//void generate_heartbeat(const account *a1, message *m, const logon *login) {
+// void generate_heartbeat(const account *a1, message *m, const logon *login) {
 
 //}
 void generate_msg(const account *a1, message *m, const logon *login) {
@@ -87,17 +88,24 @@ void generate_msg(const account *a1, message *m, const logon *login) {
 }
 
 message *start_message() {
-	logon login = {"c537779d863d054eb803522a53fac09c", "Th/ydPigXK7kdROh31J9tgBoCsU6kgOc3WDINrGBotzcRaVlWekuNFGK1sVnS3GVG2Jp1wTHASLjIPUcVclkbw==","012345"};
-	logon login2 = {"dc9ebb680625f99c2b17c572fb86e6b3","8hgmPq1g718dLrihpKk1x0+IKQiyQkwijVdYH8iOWlfA78iCbMuDk2yE3akcFildqjnltjrK5SyvHLRWCC4w8g==","012345"};
+	logon login = {"c537779d863d054eb803522a53fac09c",
+		       "Th/"
+		       "ydPigXK7kdROh31J9tgBoCsU6kgOc3WDINrGBotzcRaVlWekuNFGK1s"
+		       "VnS3GVG2Jp1wTHASLjIPUcVclkbw==",
+		       "012345"};
+	logon login2 = {
+	    "dc9ebb680625f99c2b17c572fb86e6b3",
+	    "8hgmPq1g718dLrihpKk1x0+"
+	    "IKQiyQkwijVdYH8iOWlfA78iCbMuDk2yE3akcFildqjnltjrK5SyvHLRWCC4w8g==",
+	    "012345"};
 	account *a1 = account_new(&login);
 	account *a2 = account_new(&login2);
 	message *m = message_new2(9, a2);
 	generate_msg(a2, m, &login2);
-	free(a1); free(a2);
+	free(a1);
+	free(a2);
 	return m;
 }
-
-
 
 #ifdef test
 int main() {
@@ -126,3 +134,5 @@ int main() {
 	   */
 }
 #endif
+#include <pthread.h>
+pthread_mutex_t m1;

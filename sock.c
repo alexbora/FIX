@@ -4,6 +4,7 @@
  * @created     : Sunday Jan 31, 2021 13:16:33 EET
  */
 
+#include <gsl/gsl_errno.h>
 #include <allheaders.h>
 #include <fcntl.h>
 #include <openssl/evp.h>
@@ -63,7 +64,7 @@ typedef struct Msg {
 
 typedef struct {
 	SSL *s;
-	char *login;
+	unsigned char *login;
 } threading;
 
 void *foo_heartbeart(void *ptr);
@@ -127,6 +128,7 @@ SSL *ssl_conn(const int sockfd, const char *hostname) {
 	return ssl;
 }
 
+
 void format_time(char *buf) {
 	time_t rawtime = time(0);
 	struct tm *const restrict t = localtime(&rawtime);
@@ -174,7 +176,6 @@ char *heart() {
 
 	return heartbeat;
 }
-
 void login(SSL *s, char *login) {
 	char *heart_bt = heart();
 
@@ -192,8 +193,8 @@ void login(SSL *s, char *login) {
 
 	while (1 < SSL_read(s, buf, MSG_SIZE)) {
 		printf(KGRN "\n Received: " RESET "%s\n", buf);
-		if(strstr(buf, "35=A")) {
-			printf(KGRN"\n Login OK "RESET);
+		if (strstr(buf, "35=A")) {
+			printf(KGRN "\n Login OK " RESET);
 		}
 
 		if (strstr(buf, "35=0")) {
@@ -237,14 +238,13 @@ void *login2(void *ctx) {
 		goto err;
 	}
 
-
 	SSL_write(th->s, th->login, strlen(th->login));
 	printf(KGRN "\n Login sent at " RESET "%s", asctime(tm));
 
 	while (1 < SSL_read(th->s, buf, MSG_SIZE)) {
 		printf(KGRN "\n Received: " RESET "%s\n", buf);
-		if(strstr(buf, "35=A")) {
-		printf(KGRN" Login OK\n "RESET);
+		if (strstr(buf, "35=A")) {
+			printf(KGRN " Login OK\n " RESET);
 		}
 
 		if (strstr(buf, "35=0")) {
@@ -265,6 +265,21 @@ err:
 	return NULL;
 }
 
+typedef struct {
+	pthread_mutex_t m;
+	pthread_t t;
+	SSL *s;
+	char *msg;
+} act;
+void *foo(void *ptr) {
+	act *a = ptr;
+	while (1) {
+		pthread_mutex_lock(&m1);
+		printf("pthread_self()");
+sleep(10);		pthread_mutex_unlock(&m1);
+	}
+	return NULL;
+}
 int main(void) {
 	pthread_mutex_init(&m1, NULL);
 
@@ -273,13 +288,25 @@ int main(void) {
 	message *m = start_message();
 
 	pthread_t t1;
-
+	pthread_setname_np("main");
 	threading td = {.s = s, .login = m->tmp[7]};
 
 	pthread_create(&t1, NULL, login2, &td);
-	pthread_join(t1, NULL);
+	// pthread_join(t1, NULL);
+
+	act threads[4];
+
+	for (int i = 0; i < 4; i += 1) {
+		threads[i] = (act){.m = m1, .t = t1, .s = s};
+		pthread_create(&threads[i].t, NULL, foo, &td);
+	}
 
 	//	login(s, m->tmp[7]);
+	pthread_join(t1, NULL);
+
+	for (int i = 0; i < 4; i += 1) {
+		pthread_join(threads[i].t, NULL);
+	}
 
 	pthread_mutex_destroy(&m1);
 }
