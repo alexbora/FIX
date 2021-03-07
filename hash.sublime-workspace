@@ -1,0 +1,951 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"un",
+				"unsigned\t  Keyword"
+			],
+			[
+				"LXW",
+				"LXW_BORDER_NONE"
+			],
+			[
+				"form",
+				"format_set_border()\t  int"
+			],
+			[
+				"incl",
+				"include <header>\t  Snippet"
+			],
+			[
+				"pthrea",
+				"pthread_yield_np()\t  void"
+			],
+			[
+				"ptrh",
+				"pthread_rwlock_destroy(pthread_rwlock_t * _Nonnull)\t  int"
+			],
+			[
+				"Is",
+				"I-stdio\tinc"
+			],
+			[
+				"pthread_mutex",
+				"pthread_mutex_unlock(pthread_mutex_t * _Nonnull)\t  int"
+			],
+			[
+				"pthread_Cre",
+				"pthread_create(pthread_t  _Nullable *restrict _Nonnull, const pthread_attr_t *restrict _Nullable, void * _Nullable (* _Nonnull)(void * _Nullable), void *restrict _Nullable)\t  int"
+			],
+			[
+				"pth",
+				"pthread_t\t  Interface"
+			],
+			[
+				"sem",
+				"sem_t\t  Interface"
+			],
+			[
+				"p",
+				"pword\tfunc"
+			],
+			[
+				"fo",
+				"for_\tFor Loop"
+			],
+			[
+				"sign",
+				"I-signal\tinc"
+			],
+			[
+				"sig",
+				"I-signal\tinc"
+			],
+			[
+				"lxw",
+				"lxw_format"
+			],
+			[
+				"for",
+				"for_\tFor Loop"
+			],
+			[
+				"inc",
+				"include <header>\t  Snippet"
+			],
+			[
+				"in",
+				"inc\t#include <…>"
+			],
+			[
+				"stoi",
+				"stdio.h>\t  File"
+			],
+			[
+				"id",
+				"ifndef macro\tKeyWord"
+			],
+			[
+				"lib",
+				"__STDC_WANT_LIB_EXT1__\t  Text"
+			],
+			[
+				"LXW_BOrde",
+				"LXW_BORDER_DOUBLE\tenum lxw_format_borders LXW_BORDER_DOUBLE"
+			],
+			[
+				"format_nu",
+				"format_set_num_format(lxw_format *format, const char *num_format)\tvoid"
+			],
+			[
+				"LXW_ACCO",
+				"LXW_UNDERLINE_DOUBLE_ACCOUNTING\tenum lxw_format_underlines LXW_UNDERLINE_DOUBLE_ACCOUNTING"
+			],
+			[
+				"LXW_ALI",
+				"LXW_ALIGN_RIGHT\tenum lxw_format_alignments"
+			],
+			[
+				"worksheet_merge",
+				"worksheet_merge_range(lxw_worksheet *worksheet, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col, const char *string, lxw_format *format)\tlxw_error"
+			],
+			[
+				"LXW_BO",
+				"LXW_BORDER_THIN\tenum lxw_format_borders"
+			],
+			[
+				"LXW_B",
+				"LXW_BORDER_THIN\tenum lxw_format_borders"
+			],
+			[
+				"snpr",
+				"snprintf(char *restrict __str, size_t __size, const char *restrict __format, ...)\tint"
+			],
+			[
+				"format_set_b",
+				"format_set_border(lxw_format *format, uint8_t style)\tvoid"
+			],
+			[
+				"LXW_BORDER_D",
+				"LXW_BORDER_DOTTED\tenum lxw_format_borders"
+			],
+			[
+				"format_set_bott",
+				"format_set_bottom(lxw_format *format, uint8_t style)\tvoid"
+			],
+			[
+				"work",
+				"workbook\t  int *"
+			],
+			[
+				"lxw_f",
+				"lxw_format\tTypedef"
+			],
+			[
+				"print",
+				"printf(const char *, ...)\tint"
+			],
+			[
+				"format_set_bo",
+				"format_set_bottom(lxw_format *format, uint8_t style)\tvoid"
+			],
+			[
+				"LXW_BOR",
+				"LXW_BORDER_NONE\tlxw_format_borders"
+			],
+			[
+				"format_set_border",
+				"format_set_border(lxw_format *format, uint8_t style)\tvoid"
+			],
+			[
+				"format_set_font_na",
+				"format_set_font_name(lxw_format *format, const char *font_name)\tvoid"
+			],
+			[
+				"format_set_font_siz",
+				"format_set_font_size(lxw_format *format, double size)\tvoid"
+			],
+			[
+				"format_set_bol",
+				"format_set_bold(lxw_format *format)\tvoid"
+			],
+			[
+				"worksheet_write_stri",
+				"worksheet_write_string\tlxw_error worksheet_write_string(lxw_worksheet *worksheet, lxw_row_t row, lxw_col_t col, const char *string, lxw_format *format)"
+			],
+			[
+				"LXW_IMAGE_",
+				"LXW_IMAGE_PNG\tenum image_types LXW_IMAGE_PNG"
+			],
+			[
+				"worksheet_inse",
+				"worksheet_insert_image_opt(lxw_worksheet *worksheet, lxw_row_t row, lxw_col_t col, const char *filename, lxw_image_options *options)\tlxw_error"
+			],
+			[
+				"i",
+				"islower(int _c)\tint"
+			],
+			[
+				"int",
+				"int_fast32_t\tTypedef"
+			],
+			[
+				"time",
+				"time_t\tTypedef"
+			],
+			[
+				"format_set_font",
+				"format_set_font_size(lxw_format *format, double size)\tvoid"
+			],
+			[
+				"LXW_COLOR_YELLO",
+				"LXW_COLOR_YELLOW_LIGHT\tMacro"
+			],
+			[
+				"format_set_",
+				"format_set_border\tvoid format_set_border(lxw_format *format, uint8_t style)"
+			],
+			[
+				"fscan",
+				"fscanf\tint fscanf(FILE *restrict, const char *restrict, ...)"
+			],
+			[
+				"worksheet_set_colu",
+				"worksheet_set_column_opt(lxw_worksheet *worksheet, lxw_col_t first_col, lxw_col_t last_col, double width, lxw_format *format, lxw_row_col_options *options)\tlxw_error"
+			],
+			[
+				"worksheet_write",
+				"worksheet_write_string(lxw_worksheet *worksheet, lxw_row_t row, lxw_col_t col, const char *string, lxw_format *format)\tlxw_error"
+			],
+			[
+				"format_set_co",
+				"format_set_bg_color(lxw_format *format, lxw_color_t color)\tvoid"
+			],
+			[
+				"first",
+				"first_right\tlxw_format *"
+			],
+			[
+				"firs",
+				"first_right\tlxw_format *"
+			],
+			[
+				"LXW_A",
+				"LXW_ALIGN_LEFT\tlxw_format_alignments"
+			],
+			[
+				"format_set",
+				"format_set_bold(lxw_format *format)\tvoid"
+			],
+			[
+				"format",
+				"format_next8\tlxw_format *"
+			],
+			[
+				"workbook",
+				"workbook_add_format\tlxw_format * workbook_add_format(lxw_workbook *workbook)"
+			],
+			[
+				"wor",
+				"worksheet\tlxw_worksheet *"
+			],
+			[
+				"worksheet_write_string",
+				"worksheet_write_string(lxw_worksheet *worksheet, lxw_row_t row, lxw_col_t col, const char *string, lxw_format *format)\tlxw_error"
+			],
+			[
+				"workboo",
+				"workbook_add_format\tlxw_format * workbook_add_format(lxw_workbook *workbook)"
+			],
+			[
+				"include",
+				"include <header>\tKeyWord"
+			],
+			[
+				"SSL",
+				"SSL\tTypedef"
+			],
+			[
+				"EVP_MD_CTX_in",
+				"EVP_MD_CTX_init()\t  int"
+			],
+			[
+				"EVP_ini",
+				"EVP_MD_CTX_init(ctx)\tMacro"
+			],
+			[
+				"EVP",
+				"EVP_cleanup()\tMacro"
+			],
+			[
+				"HMAC_ini",
+				"CRYPTO_F_PKEY_HMAC_INIT\tCRYPTO_F_PKEY_HMAC_INIT"
+			],
+			[
+				"mall",
+				"OPENSSL_malloc\tOPENSSL_malloc(num)"
+			],
+			[
+				"EVP_E",
+				"EVP_EncodeBlock(unsigned char *t, const unsigned char *f, int n)\tint"
+			],
+			[
+				"if",
+				"if_\tif(…)"
+			],
+			[
+				"whil",
+				"while (expression) {statements}\t  Snippet"
+			],
+			[
+				"sprin",
+				"sprintf(str, ...)\tMacro"
+			],
+			[
+				"lo",
+				"localtime_r(const time_t *restrict, struct tm *restrict)\tstruct tm *"
+			],
+			[
+				"tmp",
+				"time2posix(time_t)\ttime_t"
+			],
+			[
+				"ti",
+				"tmpfile()\tFILE *"
+			],
+			[
+				"main",
+				"main\tmain()"
+			],
+			[
+				"str",
+				"sprintf(str, ...)\tMacro"
+			],
+			[
+				"stru",
+				"struct_\tstruct"
+			],
+			[
+				"wo",
+				"worksheet\tlxw_worksheet *"
+			],
+			[
+				"lx",
+				"lxw_format\tTypedef"
+			],
+			[
+				"wokr",
+				"worksheet_set_zoom(lxw_worksheet *worksheet, uint16_t scale)\tvoid"
+			],
+			[
+				"ptread",
+				"pthread_t\tTypedef"
+			],
+			[
+				"EVP_Enco",
+				"EVP_ENCODE_LENGTH(l)\tMacro"
+			],
+			[
+				"OPENSSL_ini",
+				"OPENSSL_INIT_ENGINE_CRYPTODEV\tMacro"
+			],
+			[
+				"ls",
+				"lws_sockfd_type\tTypedef"
+			],
+			[
+				"EVP_DI",
+				"EVP_F_EVP_DIGESTUPDATE\tMacro"
+			],
+			[
+				"EVP_PK",
+				"EVP_PKEY_new()\tEVP_PKEY *"
+			],
+			[
+				"lxc",
+				"lxw_cell\tTypedef"
+			],
+			[
+				"worksheet_in",
+				"worksheet_insert_image(lxw_worksheet *worksheet, lxw_row_t row, lxw_col_t col, const char *filename)\tlxw_error"
+			],
+			[
+				"ato",
+				"asctime(const struct tm *)\tchar *"
+			],
+			[
+				"lxw_work",
+				"lxw_workbook_free(lxw_workbook *workbook)\tvoid"
+			],
+			[
+				"lxw_works",
+				"lxw_worksheet_free(lxw_worksheet *worksheet)\tvoid"
+			],
+			[
+				"lxw_wri",
+				"lxw_worksheet_prepare_header_image(lxw_worksheet *worksheet, uint32_t image_ref_id, lxw_object_properties *object_props)\tvoid"
+			],
+			[
+				"lxw_write",
+				"lxw_worksheet_write_single_row(lxw_worksheet *worksheet)\tvoid"
+			],
+			[
+				"EXI",
+				"EXIT_SUCCESS\tMacro"
+			],
+			[
+				"workshe",
+				"worksheet_insert_image(lxw_worksheet *worksheet, lxw_row_t row, lxw_col_t col, const char *filename)\tlxw_error"
+			],
+			[
+				"wok",
+				"worksheet_set_paper(lxw_worksheet *worksheet, uint8_t paper_type)\tvoid"
+			],
+			[
+				"format_",
+				"format_header\tlxw_format *"
+			],
+			[
+				"worksheet_insert",
+				"worksheet_insert_chart(lxw_worksheet *worksheet, lxw_row_t row, lxw_col_t col, lxw_chart *chart)\tlxw_error"
+			],
+			[
+				"ui",
+				"uint_least32_t\tTypedef"
+			],
+			[
+				"u",
+				"unregister_worksheet\t⟠"
+			],
+			[
+				"soc",
+				"sock *sock\t⟠"
+			],
+			[
+				"so",
+				"sock\t⟠"
+			],
+			[
+				"mem",
+				"memset(dest, ...)\tMacro"
+			],
+			[
+				"ctx",
+				"EVP_MD_CTX"
+			],
+			[
+				"pthread",
+				"pthread_mutex_t\tTypedef"
+			],
+			[
+				"te",
+				"tzset()\tvoid"
+			],
+			[
+				"ar",
+				"args\tTypedef"
+			],
+			[
+				"pa",
+				"parallel(void *params)\tvoid *"
+			],
+			[
+				"pthread_crea",
+				"pthread_create(pthread_t *restrict, const pthread_attr_t *restrict, void *(*)(void *), void *restrict)\tint"
+			],
+			[
+				"pr",
+				"printf(const char *restrict, ...)\tint"
+			],
+			[
+				"a",
+				"a;\t⟠"
+			],
+			[
+				"typ",
+				"typedef struct\t⟠"
+			],
+			[
+				"s",
+				"struct thread\t⟠"
+			],
+			[
+				"type",
+				"typedef type name\tKeyWord"
+			],
+			[
+				"pt",
+				"pthread_t\t⟠"
+			],
+			[
+				"regi",
+				"register int\t⟠"
+			],
+			[
+				"f",
+				"fprintf\tfprintf …"
+			],
+			[
+				"td",
+				"td\tTypedef"
+			],
+			[
+				"t",
+				"td\tTypedef"
+			],
+			[
+				"std",
+				"stdlib.h\tstandard header"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "sock.c",
+			"settings":
+			{
+				"buffer_size": 5702,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/C++/C Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C Single File.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++/C Single File.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"LSP",
+				"Preferences: LSP Keybindings"
+			],
+			[
+				"LSp",
+				"LSP: Restart Servers"
+			],
+			[
+				"lsp",
+				"LSP: Restart Servers"
+			],
+			[
+				"ls",
+				"LSP: Restart Servers"
+			],
+			[
+				"ena",
+				"Package Control: Enable Package"
+			],
+			[
+				"disa",
+				"Package Control: Disable Package"
+			],
+			[
+				"en",
+				"Package Control: Enable Package"
+			],
+			[
+				"dis",
+				"Package Control: Disable Package"
+			],
+			[
+				"enab",
+				"Package Control: Enable Package"
+			],
+			[
+				"packa",
+				"Package Control: List Packages"
+			],
+			[
+				"Snippet: fo",
+				"Snippet: For Loop"
+			],
+			[
+				"disab",
+				"Package Control: Disable Package"
+			],
+			[
+				"aneb",
+				"Package Control: Enable Package"
+			],
+			[
+				"Snippet: ",
+				"Snippet: if(…) else if(…) else"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"enable",
+				"Package Control: Enable Package"
+			],
+			[
+				"clang",
+				"Set Syntax: ClangErrorPanel"
+			],
+			[
+				"clan",
+				"Clang Format: Select Style"
+			],
+			[
+				"ean",
+				"Package Control: Enable Package"
+			],
+			[
+				"d",
+				"Package Control: Disable Package"
+			],
+			[
+				"package",
+				"Package Control: Remove Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"gru",
+				"gruvbox: Select Theme"
+			],
+			[
+				"",
+				"Build With: C Single File"
+			],
+			[
+				"ki",
+				"Kite: Find Related Code From File (experimental)"
+			],
+			[
+				"the",
+				"UI: Select Color Scheme"
+			],
+			[
+				"theme",
+				"UI: Select Color Scheme"
+			],
+			[
+				"C",
+				"Set Syntax: C"
+			],
+			[
+				"c ",
+				"Build With: C Single File - Run"
+			],
+			[
+				"pac",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/alex/Documents/hash"
+	],
+	"file_history":
+	[
+		"/Users/alex/Documents/hash/itoa.c",
+		"/Users/alex/Documents/hash/sock.c",
+		"/Users/alex/Documents/foaie/shuffle.c",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/ClangAutoComplete/ClangAutoComplete.sublime-settings",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/User/ClangAutoComplete.sublime-settings",
+		"/Users/alex/Documents/foaie/foaie.c",
+		"/Users/alex/Documents/hash/merge_unrolled.c",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/LSP/LSP.sublime-settings",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/User/LSP.sublime-settings",
+		"/Users/alex/Documents/sterge4.c",
+		"/Users/alex/Documents/hash/sterge2.c",
+		"/Users/alex/Documents/hash/sterge.c",
+		"/Users/alex/Desktop/sterge.c",
+		"/Users/alex/Documents/foaie/sterge2.c",
+		"/Users/alex/Desktop/mm.c",
+		"/Users/alex/Documents/foaie/sterge.c",
+		"/Users/alex/Documents/foaie/sterge11.c",
+		"/Users/alex/Documents/foaie/sterge13.c",
+		"/Users/alex/Documents/foaie/sterge888.c",
+		"/Users/alex/Documents/foaie/maincc.c",
+		"/Users/alex/Documents/foaie/sterge14.c",
+		"/Users/alex/Documents/foaie/sterge9.c",
+		"/Users/alex/Downloads/#include <openssl:ssl.h>",
+		"/Users/alex/sterge.c",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/Clang Format/clang_format_custom.sublime-settings",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/User/clang_format_custom.sublime-settings",
+		"/Users/alex/Downloads/settings",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/User/clang_format.sublime-settings",
+		"/Users/alex/Desktop/clang_format_custom.sublime-settings",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/Clang Format/clang_format.sublime-settings",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/User/sterge3.c",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/User/sterge.c",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/alex/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/Users/alex/Documents/merge_func.c",
+		"/Users/alex/Desktop/sock.c",
+		"/Users/alex/Desktop/untitled.c"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"folders":
+	[
+		{
+			"path": "/Users/alex/Documents/hash"
+		}
+	],
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "sock.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5702,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3448,
+								3448
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".<>:\"/",
+									"selector": "source.c"
+								}
+							],
+							"lsp_active": true,
+							"lsp_language":
+							{
+								"clangd": "c"
+							},
+							"show_definitions": false,
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4212.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 35.0
+	},
+	"input":
+	{
+		"height": 57.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.CppYCM.2":
+	{
+		"height": 0.0
+	},
+	"output.CppYCM.6":
+	{
+		"height": 0.0
+	},
+	"output.CppYCM.7":
+	{
+		"height": 0.0
+	},
+	"output.CppYCM.8":
+	{
+		"height": 0.0
+	},
+	"output.CppYCM.9":
+	{
+		"height": 0.0
+	},
+	"output.cc":
+	{
+		"height": 169.0
+	},
+	"output.diagnostics":
+	{
+		"height": 192.0
+	},
+	"output.exec":
+	{
+		"height": 157.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.language servers":
+	{
+		"height": 192.0
+	},
+	"output.mdpopups":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "Packages/C++/C Single File.sublime-build",
+	"project": "",
+	"replace":
+	{
+		"height": 66.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"untitled"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": false,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
