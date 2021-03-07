@@ -3,24 +3,31 @@
  * @file        : sock
  * @created     : Sunday Jan 31, 2021 13:16:33 EET
  */
-
-#include <gsl/gsl_errno.h>
+//#if !defined(_POSIX_BARRIERS) || _POSIX_BARRIERS < 0
+//#error your OS lacks POSIX barrier support
+//#endif
 #include <allheaders.h>
 #include <fcntl.h>
 #include <openssl/evp.h>
 #include <openssl/ssl.h>
 #include <pthread.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+//#include <sys/sysinfo.h>
 #include <time.h>
 
 #include "merge_unrolled.h"
+#include "utils.h"
 #define _GNU_SOURCE
 #ifndef BUFISZE
 #define BUFSIZE LWS_PRE + 64
 #endif
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 #include <netdb.h>
 #include <sys/signal.h>
@@ -54,25 +61,28 @@
 #define PORT 4198
 #endif
 
-typedef struct Msg {
-	char *header;
-	char *body;
-	char *footer;
-	char *final;
+volatile sig_atomic_t count_h, interrupted, running, flag_h;
+pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t c = PTHREAD_COND_INITIALIZER;
+pthread_rwlock_t trw;
+
+struct Args {
 	SSL *s;
-} msg;
+	char *buf;
+	char *heart_bt;
+	char *time_buf;
+	void (*greet)(char *);
+};
 
 typedef struct {
 	SSL *s;
 	unsigned char *login;
 } threading;
 
-void *foo_heartbeart(void *ptr);
-pthread_mutex_t m1;
+void *check(void *arg);
 
 int sockfd(const char hostname[], const int port) {
 	register int sockfd = 0;
-
 	struct sockaddr_in servAddr = {0};
 
 #ifdef WIN32
@@ -128,7 +138,6 @@ SSL *ssl_conn(const int sockfd, const char *hostname) {
 	return ssl;
 }
 
-
 void format_time(char *buf) {
 	time_t rawtime = time(0);
 	struct tm *const restrict t = localtime(&rawtime);
@@ -176,43 +185,6 @@ char *heart() {
 
 	return heartbeat;
 }
-void login(SSL *s, char *login) {
-	char *heart_bt = heart();
-
-	time_t t = time(NULL);
-	struct tm *tm = localtime(&t);
-
-	char *buf = malloc(MSG_SIZE);
-	if (!buf) {
-		fprintf(stderr, "%s\n", "malloc-ing receiving buffer failed");
-		goto err;
-	}
-	printf(KGRN "\n Login sent at " RESET "%s\n", asctime(tm));
-
-	SSL_write(s, login, strlen(login));
-
-	while (1 < SSL_read(s, buf, MSG_SIZE)) {
-		printf(KGRN "\n Received: " RESET "%s\n", buf);
-		if (strstr(buf, "35=A")) {
-			printf(KGRN "\n Login OK " RESET);
-		}
-
-		if (strstr(buf, "35=0")) {
-			pthread_mutex_lock(&m1);
-			SSL_write(s, heart_bt, strlen(heart_bt));
-			pthread_mutex_unlock(&m1);
-			printf(KMAG " Heartbeat sent at " RESET "%s\n",
-			       asctime(tm));
-		}
-	}
-err:
-	free(heart_bt);
-	heart_bt = NULL;
-	free(buf);
-	buf = NULL;
-	tm = NULL;
-	exit(EXIT_FAILURE);
-}
 
 char *GenerateCheckSum(char *buf, long bufLen) {
 	static char tmpBuf[4];
@@ -226,20 +198,24 @@ char *GenerateCheckSum(char *buf, long bufLen) {
 }
 
 void *login2(void *ctx) {
+	//	pthread_detach(pthread_self());
 	threading *th = ctx;
+	struct Args a;
 	char *heart_bt = heart();
 
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);
 
 	char *buf = malloc(MSG_SIZE);
-	if (!buf) {
-		fprintf(stderr, "%s\n", "malloc-ing receiving buffer failed");
-		goto err;
-	}
 
 	SSL_write(th->s, th->login, strlen(th->login));
 	printf(KGRN "\n Login sent at " RESET "%s", asctime(tm));
+
+	/* code adnotation */
+
+	a = (struct Args){th->s, buf, heart_bt, .time_buf = malloc(64),
+			  .greet = format_time};
+	a.greet(a.time_buf);
 
 	while (1 < SSL_read(th->s, buf, MSG_SIZE)) {
 		printf(KGRN "\n Received: " RESET "%s\n", buf);
@@ -247,66 +223,97 @@ void *login2(void *ctx) {
 			printf(KGRN " Login OK\n " RESET);
 		}
 
-		if (strstr(buf, "35=0")) {
-			pthread_mutex_lock(&m1);
-			SSL_write(th->s, heart_bt, strlen(heart_bt));
-			pthread_mutex_unlock(&m1);
-			printf(KMAG " Heartbeat sent at " RESET "%s\n",
-			       asctime(tm));
-		}
+		check(&a);
 	}
-err:
-	free(heart_bt);
-	heart_bt = NULL;
-	free(buf);
-	buf = NULL;
-	tm = NULL;
-	exit(EXIT_FAILURE);
 	return NULL;
 }
 
-typedef struct {
-	pthread_mutex_t m;
-	pthread_t t;
-	SSL *s;
-	char *msg;
-} act;
-void *foo(void *ptr) {
-	act *a = ptr;
+void *check(void *arg) {
+	struct Args *a = arg;
+
+	if (strstr(a->buf, "35=0")) {
+		pthread_mutex_lock(&m1);
+		SSL_write(a->s, a->heart_bt, strlen(a->heart_bt));
+		count_h++;
+		flag_h++;
+		pthread_cond_signal(&c);
+		pthread_mutex_unlock(&m1);
+		printf(KMAG " Heartbeat no %d sent at %s\n" RESET, count_h,
+		       a->time_buf);
+	}
+
+	return NULL;
+}
+
+void *stat_print(void *arg) {
+	pthread_detach(pthread_self());
+	int prev;
 	while (1) {
 		pthread_mutex_lock(&m1);
-		printf("pthread_self()");
-sleep(10);		pthread_mutex_unlock(&m1);
+		prev = count_h;
+		while (prev == count_h) {
+			pthread_cond_wait(&c, &m1);
+		}
+		printf("%s\t%d\n", "\nCondition", count_h);
+		pthread_mutex_unlock(&m1);
 	}
 	return NULL;
 }
+void *stats(void *arg) {
+	pthread_detach(pthread_self());
+	int flag;
+	while (1) {
+		pthread_rwlock_rdlock(&trw);
+		flag = flag_h;
+		while (flag == flag_h) {
+			pthread_rwlock_unlock(&trw);
+		}
+		printf("%s\t%d\n", "Flag_h", flag_h);
+		pthread_rwlock_unlock(&trw);
+	}
+	return NULL;
+}
+
 int main(void) {
-	pthread_mutex_init(&m1, NULL);
+	unsigned int eax = 11, ebx = 0, ecx = 1, edx = 0;
 
+	__asm__ volatile("cpuid"
+			 : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
+			 : "0"(eax), "2"(ecx)
+			 :);
+
+	printf("Cores: %d\nThreads: %d\nActual thread: %d\n", eax, ebx, edx);
+#if 0
+unsigned int ncores = 0, nthreads = 0, ht = 0;
+
+	__asm__ volatile("cpuid"
+		     : "=a"(ncores), "=b"(nthreads)
+		     : "a"(0xb), "c"(0x1)
+		     :);
+
+	ht = (ncores != nthreads);
+
+	printf("Cores: %d\nThreads: %d\nHyperThreading: %s\n", ncores, nthreads,
+	       ht ? "Yes" : "No");
+
+#endif
 	SSL *s = ssl_conn(sockfd(HOST, PORT), HOST);
-
 	message *m = start_message();
 
 	pthread_t t1;
-	pthread_setname_np("main");
 	threading td = {.s = s, .login = m->tmp[7]};
 
 	pthread_create(&t1, NULL, login2, &td);
-	// pthread_join(t1, NULL);
 
-	act threads[4];
+	pthread_t heartbeat;
+	pthread_create(&heartbeat, NULL, stat_print, NULL);
 
-	for (int i = 0; i < 4; i += 1) {
-		threads[i] = (act){.m = m1, .t = t1, .s = s};
-		pthread_create(&threads[i].t, NULL, foo, &td);
-	}
+	pthread_t trw;
+	pthread_create(&trw, NULL, stats, NULL);
 
-	//	login(s, m->tmp[7]);
+	pthread_t *threads = malloc(4 * sizeof(pthread_t));
+
 	pthread_join(t1, NULL);
-
-	for (int i = 0; i < 4; i += 1) {
-		pthread_join(threads[i].t, NULL);
-	}
 
 	pthread_mutex_destroy(&m1);
 }

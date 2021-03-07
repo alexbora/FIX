@@ -57,13 +57,12 @@ typedef struct{
    const char *pass;
    size_t len;
 } logon;
-
 unsigned checksum(const unsigned char *buffer, const size_t len, unsigned seed);
-static inline
 void generate_msg(const account *a1, message *m, const logon *login);
 account *account_new(logon *);
 message *message_new2(int const size, const account *a);
 message *start_message();
+static inline 
 void format_time(char *buf);
 
 int sockfd(const char hostname[], const int port);

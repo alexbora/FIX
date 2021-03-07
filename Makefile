@@ -11,10 +11,15 @@ IFLAGS+='-I/Users/alex/tech/root/include/openssl'
 IFLAGS+="-I/Users/alex/tech/include" 
 LFLAGS="-L/usr/local/opt/curl/lib"
 LFLAGS+="-L/Users/alex/tech/root/lib"
-CFLAGS= -std=c2x -g -O3 -lcrypto -lssl -lxlsxwriter -lpthread -lcurl
+
+CFLAGS= -std=c2x -g -O3 -lcrypto -lssl -lxlsxwriter -lpthread -lcurl -fstack-protector-strong -D_FORTIFY_SOURCE=1 #-D_POSIX_C_SOURCE=200809L
 CC=gcc-10
 
-FIX: sock.c merge_unrolled.c
-	$(CC) $(CFLAGS) $(IFLAGS) $(LFLAGS) sock.c merge_unrolled.c -o FIX
+FIX: sock.c merge_unrolled.c utils.c
+	$(CC) $(IFLAGS) $(LFLAGS) sock.c merge_unrolled.c utils.c -o FIX  $(CFLAGS) 
+
+.c:
+		$(CC) $(IFLAGS) $(LFLAGS) -o $@ $< $(CFLAGS)
 clean:
-	rm -rf FIX FIX.dSYM sock.dSYM merge_unrolled.dSYM a.out *.dSYM merge
+	rm -rf FIX a.out *.dSYM merge
+include config.mk

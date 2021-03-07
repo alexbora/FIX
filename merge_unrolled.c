@@ -134,5 +134,3 @@ int main() {
 	   */
 }
 #endif
-#include <pthread.h>
-pthread_mutex_t m1;
