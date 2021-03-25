@@ -5,7 +5,7 @@
  */
 
 //#include "single_order.h"
-
+in
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -195,11 +195,15 @@ int main() {
   dictionary_add(body, keyval_new("|38=", "QTY"));
   dictionary_add(body, keyval_new("|55=", "BTC"));
 
-  char *bdy[] = {
+  char *bdy[16] = {
       "D",         "|49=Coinbase", "|56=Coinbase", "|15=EUR", "|21=1",
       "|44=price", "|54=side",     "|38=QTY",      "|55=BTC", NULL};
 
   message_new2(template, bdy);
+  printf("VALUE: %s\n", template->pairs[0]->value);
+
+
+
   char *bff = malloc(64);
   csum("text", bff);
   printf("bff=%s\n", bff);
