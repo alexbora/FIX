@@ -241,6 +241,15 @@ void *check(void *arg) {
   if (strstr(a->buf, "35=0")) {
     pthread_mutex_lock(&m1);
     SSL_write(a->s, a->heart_bt, strlen(a->heart_bt));
+#if 0
+char *m = mai(0);
+for (unsigned i = 0; i <  strlen(m); i++) {
+    (m[i] == '|') ? m[i] = '\1' : 0;
+}
+printf("Mi : %s\n", m);
+#endif
+SSL_write(a->s,  m,  strlen(m));
+
     count_h++;
     flag_h++;
     pthread_cond_signal(&c);

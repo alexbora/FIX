@@ -10,7 +10,7 @@
 
 #include <openssl/ssl.h>
 char *init(char *);
-
+char *mai(char *);
 
 #endif /* end of include guard UTILS_H */
 

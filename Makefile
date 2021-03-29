@@ -16,7 +16,7 @@ CFLAGS= -std=c2x -g -O3 -lcrypto -lssl -lxlsxwriter -lpthread -lcurl -fstack-pro
 CC=gcc-10
 
 FIX: sock.c merge_unrolled.c utils.c
-	$(CC) $(IFLAGS) $(LFLAGS) sock.c merge_unrolled.c utils.c -o FIX  $(CFLAGS) 
+	$(CC) $(IFLAGS) $(LFLAGS) sock.c merge_unrolled.c utils.c test_x3.c -o FIX2  $(CFLAGS) 
 
 .c:
 		$(CC) $(IFLAGS) $(LFLAGS) -o $@ $< $(CFLAGS)
